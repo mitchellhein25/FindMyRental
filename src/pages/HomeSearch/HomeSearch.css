@@ -1,0 +1,67 @@
+html {
+    height: 100%;
+}
+
+body {
+    background-size: cover;
+    height: 100%;
+    background: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ),url(../../assets/images/background.jpg) no-repeat;
+    background-size: cover;
+    color: white;
+}
+
+.tinted { 
+    opacity: 0.8; 
+}
+
+.fill {
+    min-height: 100%;
+    height: 100%;
+}
+
+.title {
+    font-family: 'Pacifico';
+    position: absolute;
+    left: 0%;
+    top: 1%;
+}
+
+.title-row {
+    padding-bottom: 2%;
+}
+
+.search-body {
+    margin: auto;
+}
+
+.form-control:focus {
+    border-color: #FF0000;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6);
+  }
+
+.subTitle {
+    padding: 1.5% 0 1.5% 0;
+    border-top: 4px white solid;
+    border-bottom: 4px white solid;
+    display: flex;
+    justify-content: center;
+}
+
+.sub-title-row {
+    margin: 1.5% 0 1.5% 0;
+}
+
+#helpBlock {
+    color: white;
+    font-size: large;
+    margin: auto;
+    text-align: center;
+}
+
+.radio-title {
+    margin-right: 2%;
+}
+
+label {
+    font-size: large;
+}
