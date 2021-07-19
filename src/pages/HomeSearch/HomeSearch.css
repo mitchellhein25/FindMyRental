@@ -4,8 +4,9 @@ html {
 
 body {
     background-size: cover;
-    height: 100%;
+    height: auto;
     background: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ),url(../../assets/images/background.jpg) no-repeat;
+    background-repeat: repeat-y;
     background-size: cover;
     color: white;
 }
@@ -65,3 +66,26 @@ body {
 label {
     font-size: large;
 }
+
+.property-container {
+    border: solid 3px lightgrey;
+    background-color: rgba(172, 163, 163, 0.6);
+    box-shadow: 5px 5px 5px 0px black;
+    color: black; 
+    margin-bottom: 1%;
+}
+
+.bold {
+    font-weight: 600;
+    font-size: 1.3em;
+    font-style: italic;
+}
+
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}
+

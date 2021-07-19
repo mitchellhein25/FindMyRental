@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './HomeSearch.css';
 import axios from 'axios';
+import XLSX from 'xlsx';
+
+import PropertyDetailsForm from '../../components/PropertyDetailsForm/PropertyDetailsForm';
+import RentEstimateForm from '../../components/RentEstimateForm/RentEstimateForm';
+import MortgageDetailsForm from '../../components/MortgageDetailsForm/MortgageDetailsForm';
+import ExpensesForm from '../../components/ExpensesForm/ExpensesForm';
+
+import { rent, currencyFormat, bathrooms} from '../../components/HomeSearchUtils/HomeSearchUtils.js';
 
 function HomeSearch() {
 
+    const [propertyList, setPropertyList] = useState([]);
+    const [scrollToTopVisible, setScrollToTopVisible] = useState(false);
+
+    //Property Details  
     const [propType, setPropType] = useState(null);
     const [priceMin, setPriceMin] = useState("");
     const [priceMax, setPriceMax] = useState("");
@@ -11,7 +23,148 @@ function HomeSearch() {
     const [baths, setBaths] = useState(null);
     const [zip, setZip] = useState("");
 
+    //Rent Estimate
+    const [monthlyRent, setMonthlyRent] = useState(null);
+    const [rentPerRoom, setRentPerRoom] = useState(500);
+    const [totalRent, setTotalRent] = useState(null);
+    const [roomOrTotal, setRoomOrTotal] = useState(null);
+    const [rentWarning, setRentWarning] = useState(false);
+
+    //Mortgage Details
+    const [downPaymentPercent, setDownPaymentPercent] = useState(3.5);
+    const [downPaymentTotal, setDownPaymentTotal] = useState(null);
+    const [totalDownPayment, setTotalDownPayment] = useState(null);
+    const [percentOrTotal, setPercentOrTotal] = useState(null);
+    const [downPaymentWarning, setDownPaymentWarning] = useState(null);
+    const [interestRate, setInterestRate] = useState(3);
+    const [homeInsure, setHomeInsure] = useState(100);
+    const [propTax, setPropTax] = useState(1.5);
+    const [loanLength, setLoanLength] = useState(30);
+
+    //Expense Details
+    const [utilities, setUtilities] = useState(150);
+    const [vacancy, setVacancy] = useState(7);
+    const [repairMaint, setRepairMaint] = useState(1);
+    const [capEx, setCapEx] = useState(1);
+    const [other, setOther] = useState(1); 
+
+    const toCsv = () => {
+        var propertyArray = [];
+        propertyList.map((property) => (
+            propertyArray.push({
+                "Address": property.address.line, 
+                "City": property.address.city, 
+                "Price": property.price, 
+                "Beds": property.beds, 
+                "Baths": bathrooms(property.baths_full, property.baths),
+                "Downpayment": downpayment(property), 
+                "Mortgage": mortgage(property), 
+                "Total Payment": totalPayment(property), 
+                "Total Expenses": totalExpenses(property), 
+                "Rent": rent(property.beds, roomOrTotal, monthlyRent), 
+                "CashFlow": cashFlow(property), 
+                "COC ROI": cocRoi(property), 
+                "Total ROI": totalRoi(property)
+            })
+        ))
+        let workSheet = XLSX.utils.json_to_sheet(propertyArray);
+        var workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, zip + " Results");
+        XLSX.writeFile(workBook, zip + "_Results.xlsx");
+    }
+
+    function principal(property) {
+        return property.price - (percentOrTotal === 'percent' ? property.price * (totalDownPayment/100) : totalDownPayment);
+    }
+
+    function firstExp() {
+        return ((interestRate/100)/12) * Math.pow((1+((interestRate/100)/12)), loanLength*12);
+    }
+    
+    function secondExp() {
+        return Math.pow(1+((interestRate/100)/12), loanLength*12) - 1;
+    }
+
+    function mortgage(property) {
+        return (principal(property) * firstExp()) / secondExp();
+    }
+
+    function downpayment(property) {
+        return percentOrTotal === 'percent' ? property.price * (totalDownPayment/100) : totalDownPayment;
+    }
+
+    function totalPayment(property) {
+        return parseFloat(mortgage(property)) + 
+        parseFloat(homeInsure) + parseFloat(((propTax/100)*property.price)/12);
+    }
+
+    function totalExpenses(property) {
+        return parseFloat(utilities) + parseFloat(((vacancy/100) * monthlyRent)) + parseFloat((((repairMaint/100) * property.price)/12)) + 
+        parseFloat((((capEx/100) * property.price)/12)) + parseFloat((((other/100) * property.price)/12));
+    }
+    
+    function cashFlow(property) {
+        return rent(property.beds, roomOrTotal, monthlyRent) - (parseFloat(totalExpenses(property)) + 
+        parseFloat(totalPayment(property)));
+    }
+
+    function cocRoi(property) {
+        return (cashFlow(property) * 12) / (downpayment(property) + (property.price*.03)) * 100;
+    }
+
+    function totalRoi(property) {
+        return ((cashFlow(property) * 12) + (property.price*.02) + (property.price*.01)) / (downpayment(property) + (property.price*.03)) * 100;
+    }
+    
+    useEffect(() => {
+
+        //Calculate Rent
+        if (rentPerRoom === 0 || rentPerRoom === "") {
+            setRentPerRoom(null);
+        }
+        if (totalRent === 0 || totalRent === "") {
+            setTotalRent(null);
+        }
+        if (rentPerRoom != null && totalRent != null) {
+            setRentWarning(true)
+            setMonthlyRent(null);
+            window.history.back();
+        } else if (rentPerRoom === null ) {
+            setRentWarning(false)
+            setRoomOrTotal("total");
+            setMonthlyRent(totalRent);
+        } else {
+            setRentWarning(false)
+            setRoomOrTotal("room");
+            setMonthlyRent(rentPerRoom);
+        }
+
+        //Calculate Downpayment
+        if (downPaymentPercent === 0 || downPaymentPercent === "") {
+            setDownPaymentPercent(null);
+        }
+        if (downPaymentTotal === 0 || downPaymentTotal === "") {
+            setDownPaymentTotal(null);
+        }
+        if (downPaymentPercent != null && downPaymentTotal != null) {
+            setDownPaymentWarning(true)
+            setTotalDownPayment(null);
+            window.history.back();
+        } else if (downPaymentPercent === null ) {
+            setDownPaymentWarning(false)
+            setPercentOrTotal("total");
+            setTotalDownPayment(downPaymentTotal);
+        } else {
+            setDownPaymentWarning(false)
+            setPercentOrTotal("percent");
+            setTotalDownPayment(downPaymentPercent);
+        }
+        
+    })
+
     const handleSubmit = (e) => {
+
+        //Get the properties based on details
         e.preventDefault();
         
         var options = {
@@ -35,11 +188,66 @@ function HomeSearch() {
         };
 
         axios.request(options).then(function (response) {
-            console.log(response.data);
+            setPropertyList(response.data.properties);
         }).catch(function (error) {
             console.error(error);
         });
     }
+
+    const clearForm = () => {
+        setPropertyList([]);
+        setPropType("");
+        setPriceMin("");
+        setPriceMax("");
+        setBeds("");
+        setBaths("");
+        setZip("");
+
+        //Rent Estimate
+        setMonthlyRent("");
+        setRentPerRoom("");
+        setTotalRent("");
+        setRoomOrTotal("");
+        setRentWarning(false);
+
+        //Mortgage Details
+        setDownPaymentPercent("");
+        setDownPaymentTotal("");
+        setTotalDownPayment("");
+        setPercentOrTotal("");
+        setDownPaymentWarning("");
+        setInterestRate("");
+        setHomeInsure("");
+        setPropTax("");
+        setLoanLength("");
+
+        //Expense Details
+        setUtilities("");
+        setVacancy("");
+        setRepairMaint("");
+        setCapEx("");
+        setOther("");
+    }
+
+    //source: https://www.geeksforgeeks.org/how-to-create-a-scroll-to-top-button-in-react-js/
+    const toggleVisible = () => {
+        const scrolled = document.documentElement.scrollTop;
+        if (scrolled > 300){
+          setScrollToTopVisible(true)
+        } 
+        else if (scrolled <= 300){
+          setScrollToTopVisible(false)
+        }
+      };
+
+    function scrollToTop() {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      }
+
+    window.addEventListener('scroll', toggleVisible);
 
     return (
         <div className="container fill main-container">
@@ -50,288 +258,124 @@ function HomeSearch() {
                 <div className="row sub-title-row">
                     <div className="col-5"></div>
                     <div className="col-2 d-flex justify-content-center">
-                        <button type="submit" className="btn btn-dark btn-lg">RESET</button>
+                        <button type="" onClick={(e) => {clearForm()}} className="btn btn-dark btn-lg">RESET</button>
                     </div>
                     <div className="col-5"></div>
                     
                 </div> 
                        
                 <form onSubmit={handleSubmit}>
-                <div className="row"> 
-                    <div className="col-6"> 
-                        <fieldset>
-                            <div className="row sub-title-row">
-                                <div className="col-3"></div>
-                                <div className="col-6">
-                                    <legend><h2 className="subTitle">Property Details</h2></legend>
-                                </div>
-                                <div className="col-3"></div>
-                            </div>
+                    <div className="row"> 
+                        <div className="col-6"> 
+                            <PropertyDetailsForm
+                                propType = {propType}
+                                setPropType = {setPropType}
+                                priceMin = {priceMin}
+                                setPriceMin = {setPriceMin}
+                                priceMax = {priceMax}
+                                setPriceMax = {setPriceMax}
+                                beds = {beds}
+                                setBeds = {setBeds}
+                                baths = {baths}
+                                setBaths = {setBaths}
+                                zip = {zip}
+                                setZip = {setZip}
+                            />
 
-                            <div className="form-row">
-                                <label htmlFor="property-type">Property Type</label>
-                                <select className="form-control"
-                                value={propType} onChange={e => setPropType(e.target.value)}>
-                                    <option defaultValue>Choose...</option>
-                                    <option value="single_family">Single Family</option>
-                                    <option value="multi_family">Multi-Family</option>
-                                    <option value="condo">Condo</option>
-                                    <option value="mobile">Mobile</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-
-                            <br></br>
+                            <RentEstimateForm
+                                rentPerRoom = {rentPerRoom}
+                                setRentPerRoom = {setRentPerRoom}
+                                totalRent = {totalRent}
+                                setTotalRent = {setTotalRent}
+                                rentWarning = {rentWarning}
+                            />
+                        </div>
+                        
+                        <div className="col-6">
                             
-                                <label>Purchase Price</label>
-                                <div className="row">
-                                    $
-                                    <div className="form-group col-5">
-                                        <input className="form-control" type="number" placeholder="Min"
-                                        value={priceMin} onChange={e => setPriceMin(e.target.value)}></input>
-                                    </div>
-                                    TO
-                                    $
-                                    <div className="form-group col-5">
-                                        <input className="form-control" type="number" placeholder="Max"
-                                        value={priceMax} onChange={e => setPriceMax(e.target.value)}></input>
-                                    </div>
-                                </div>
+                            <MortgageDetailsForm 
+                                downPaymentPercent = {downPaymentPercent}
+                                setDownPaymentPercent = {setDownPaymentPercent}
+                                downPaymentTotal = {downPaymentTotal}
+                                setDownPaymentTotal = {setDownPaymentTotal}
+                                downPaymentWarning = {downPaymentWarning}
+                                interestRate = {interestRate}
+                                setInterestRate = {setInterestRate}
+                                homeInsure = {homeInsure}
+                                setHomeInsure = {setHomeInsure}
+                                propTax = {propTax}
+                                setPropTax = {setPropTax}
+                                loanLength = {loanLength}
+                                setLoanLength = {setLoanLength}
+                            />
 
-                            <br></br>
-                            
-                            <div className="form-group">
-                                <label className="radio-title">Bedrooms</label>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label" htmlFor="one-bed">1+</label>
-                                    <input className="form-check-input" type="radio" id="oneBed" checked={beds === 1}
-                                    onChange={e => setBeds(1)}></input>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label" htmlFor="two-bed">2+</label>
-                                    <input className="form-check-input" type="radio" id="twoBed" checked={beds === 2}
-                                    onChange={e => setBeds(2)}></input>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label" htmlFor="three-bed">3+</label>
-                                    <input className="form-check-input" type="radio" id="threeBed" checked={beds === 3}
-                                    onChange={e => setBeds(3)}></input>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label" htmlFor="four-bed">4+</label>
-                                    <input className="form-check-input" type="radio" id="fourBed" checked={beds === 4}
-                                    onChange={e => setBeds(4)}></input>
-                                </div>
-                            </div>
-
-                            <br></br>
-                            
-                            <div className="form-group">
-                                <label className="radio-title"><p>Bathrooms</p></label>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label" htmlFor="one-bath">1+</label>
-                                    <input className="form-check-input" type="radio" id="oneBath" checked={baths === 1}
-                                    onChange={e => setBaths(1)}></input>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label" htmlFor="two-bath">2+</label>
-                                    <input className="form-check-input" type="radio" id="twoBath" checked={baths === 2}
-                                    onChange={e => setBaths(2)}></input>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label" htmlFor="three-bath">3+</label>
-                                    <input className="form-check-input" type="radio" id="threeBath" checked={baths === 3}
-                                    onChange={e => setBaths(3)}></input>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label" htmlFor="four-bath">4+</label>
-                                    <input className="form-check-input" type="radio" id="fourBath" checked={baths === 4}
-                                    onChange={e => setBaths(4)}></input>
-                                </div>
-                            </div>
-                            
-                            <div className="form-group">
-                            <label>Zip Code</label>
-                            <div className="col-4">
-                                <input className="form-control" value={zip} 
-                                onChange={e => setZip(e.target.value)} type="text" pattern="[0-9]*"></input>
-                            </div>
-                            </div>
-
-                        </fieldset>
-
-                        <fieldset>
-                            <div className="row sub-title-row mt-5">
-                                <div className="col-3"></div>
-                                <div className="col-6">
-                                    <legend><h2 className="subTitle">Rent Estimate</h2></legend>
-                                </div>
-                                <div className="col-3"></div>
-                            </div>
-                            
-
-                            <div className="form-group">
-                                <label>Projected Monthly Rent</label>
-                                <div className="row">
-                                    $
-                                    <div className="col-5">
-                                        <input className="form-control" type="number" id="perRoom"></input>
-                                        <div>
-                                            <small className="form-text text-muted">
-                                                <p id="helpBlock" >Per Room</p>
-                                            </small>
-                                        </div>
-                                    </div>
-                                    OR
-                                    $
-                                    <div className="col-5">
-                                        <input className="form-control" type="number"id="totalRent"></input> 
-                                        <div>
-                                            <small className="form-text text-muted">
-                                                <p id="helpBlock" >Total</p>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </fieldset>
+                            <ExpensesForm
+                                utilities = {utilities}
+                                setUtilities = {setUtilities}
+                                vacancy = {vacancy}
+                                setVacancy = {setVacancy}
+                                repairMaint = {repairMaint}
+                                setRepairMaint = {setRepairMaint}
+                                capEx = {capEx}
+                                setCapEx = {setCapEx}
+                                other = {other}
+                                setOther = {setOther}
+                            />
 
                         </div>
-                    
-                    <div className="col-6">
-                        <fieldset>
-                            <div className="row sub-title-row">
-                                <div className="col-3"></div>
-                                <div className="col-6">
-                                    <legend><h2 className="subTitle">Mortgage</h2></legend>
-                                </div>
-                                <div className="col-3"></div>
-                            </div>
-                            
-                            
-                            <div className="form-group">
-                                <label>Down Payment</label>
-                                <div className="row">
-                                    <div className="col-5">
-                                        <input className="form-control" type="number"></input> 
-                                    </div>
-                                    %
-                                    OR
-                                    $
-                                    <div className="col-5">
-                                        <input className="form-control" type="number"></input>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <br></br>
-                            
-                            <div className="form-group">
-                                <label>Interest Rate (estimated)</label>
-                                <div className="row">
-                                    <div className="col-2">
-                                        <input className="form-control" type="number"></input>
-                                    </div>
-                                    %
-                                </div>
-                            </div>
-
-                            <br></br>
-                            
-                            <div className="form-group">
-                                <label className="radio-title">Loan Term Length (years)</label>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label"  htmlFor="ten-year">10</label>
-                                    <input className="form-check-input" type="radio" name="loan-length" id="tenYear" value="ten"></input>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label"  htmlFor="fifteen-year">15</label>
-                                    <input className="form-check-input" type="radio" name="loan-length" id="fifteenYear" value="fifteen"></input>
-                                </div>
-                                <div className="form-check form-check-inline">
-                                    <label className="form-check-label"  htmlFor="thirty-year">30</label>
-                                    <input className="form-check-input" type="radio" name="loan-length" id="thirtyYear" value="thirty"></input>
-                                </div>
-                            </div>
-
-                        </fieldset>
-
-                        <fieldset>
-                            <div className="row sub-title-row">
-                                <div className="col-3"></div>
-                                <div className="col-6">
-                                    <legend><h2 className="subTitle">Expenses</h2></legend>
-                                </div>
-                                <div className="col-3"></div>
-                            </div>
-                            
-                            <div className="row">
-                                <div className="col-3"></div>
-                                <div className="col-5">
-                                    <label>Utilities (estimated)</label>
-                                </div>
-                                <div className="col-3"></div>
-                            </div>
-                            <div className="row">
-                                <div className="col-3"></div>
-                                $
-                                <div className="col-5">
-                                    <input className="form-control" type="number"></input>
-                                </div>
-                                <div className="col-3"></div>
-                            </div>
-
-                            <br></br>
-                            
-                            <div className="row">
-                                <div className="col-5">
-                                    <label>Vacancy</label>
-                                    <input className="form-control" type="number"></input>
-                                </div>
-                                <br></br>
-                                %
-                                <div className="col-5">
-                                    <label>Capital Expenditures</label>
-                                    <input className="form-control" type="number"></input>
-                                </div>
-                                <br></br>
-                                %
-                            </div>
-
-                            <br></br>
-                            
-                            
-                            <div className="row">
-                                <div className="col-5">
-                                    <label>Repairs and Maintenance</label>
-                                    <input className="form-control" type="number"></input>
-                                </div>
-                                <br></br>
-                                %
-                                <div className="col-5">
-                                    <label>Other (PM, HOA, etc.)</label>
-                                    <input className="form-control" type="number"></input>
-                                </div>
-                                <br></br>
-                                %
-                            </div>
-
-                        </fieldset>
-
-                        
-                    </div>
                     </div>
                 
-
                 <div className="row">
-                    <div className="col-5"></div>
+                    <div className="col-1"></div>
                     <div className="col-2 d-flex justify-content-center">
-                        <button type="submit" className="btn btn-danger btn-lg mt-3 mb-4">GET RESULTS</button>
+                    <button onClick={(e) => { toCsv() }} className="text-nowrap btn btn-success btn-lg mt-3 mb-4">
+                        Export Search Results</button>
                     </div>
-                    <div className="col-5"></div>
+                    <div className="col-2"></div>
+                    <div className="col-2 d-flex justify-content-center">
+                        <button type="submit" className="text-nowrap btn btn-danger btn-lg mt-3 mb-4">GET RESULTS</button>
+                    </div>
+                    <div className="col-2"></div>
+                    <div className="col-2 d-flex justify-content-center">
+                        <button type="" className="text-nowrap btn btn-info btn-lg mt-3 mb-4">Location Information</button>
+                    </div>
+                    <div className="col-1"></div>
                 </div>
                 </form>
+            </div>
+            <div>
+                {propertyList.map((property) => ( 
+                    <div className="container fill main-container">
+                        <div className="row property-container rounded"> 
+                            <div className="col-4 my-auto">
+                                <h2 className="text-center">{property.address.line}</h2>
+                                <h3 className="text-center">{property.address.city}</h3>
+                                <h1 className="text-center">${currencyFormat(property.price)}</h1>
+                                <h3 className="text-center">{property.beds} Bed, {property.baths_full, property.baths} Bath</h3>
+                            </div>
+                            <div className="col-4 my-auto">
+                                <p className="bold text-left">Down Payment: ${currencyFormat(downpayment(property))}</p>
+                                <p className="bold text-left">Mortgage: ${currencyFormat(mortgage(property))}</p>
+                                <p className="bold text-left">Total Payment: ${currencyFormat(totalPayment(property))}</p>
+                                <p className="bold text-left">Total Expenses: ${currencyFormat(totalExpenses(property))}</p>
+                            </div>
+                        
+                            <div className="col-4 my-auto">
+                                <p className="bold text-left">Monthly Rent: ${currencyFormat(rent(property.beds, roomOrTotal, monthlyRent))}</p>
+                                <p className="bold text-left">Cash Flow: ${currencyFormat(cashFlow(property))}</p>
+                                <p className="bold text-left">Cash on Cash ROI: {currencyFormat(cocRoi(property))}%</p>
+                                <p className="bold text-left">Total ROI: {currencyFormat(totalRoi(property))}%</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div className="row fixed-bottom">
+                <div className="col-5"></div>
+                <div className="col-2 d-flex justify-content-center">
+                    <button type="" onClick={scrollToTop} style={{display: scrollToTopVisible ? 'flex' : 'none'}} className="btn btn-dark btn-lg mb-2">Back to Top</button>
+                </div>
+                <div className="col-5"></div>
             </div>
         </div>
         
