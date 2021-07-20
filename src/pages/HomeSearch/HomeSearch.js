@@ -7,6 +7,7 @@ import PropertyDetailsForm from '../../components/PropertyDetailsForm/PropertyDe
 import RentEstimateForm from '../../components/RentEstimateForm/RentEstimateForm';
 import MortgageDetailsForm from '../../components/MortgageDetailsForm/MortgageDetailsForm';
 import ExpensesForm from '../../components/ExpensesForm/ExpensesForm';
+import placeholderImage from '../../assets/images/placeholder-map.png';
 
 import { rent, currencyFormat, bathrooms} from '../../components/HomeSearchUtils/HomeSearchUtils.js';
 
@@ -328,7 +329,7 @@ function HomeSearch() {
                 <div className="row">
                     <div className="col-1"></div>
                     <div className="col-2 d-flex justify-content-center">
-                    <button onClick={(e) => { toCsv() }} className="text-nowrap btn btn-success btn-lg mt-3 mb-4">
+                    <button style={{display: propertyList.length > 0 ? 'flex' : 'none'}} onClick={(e) => { toCsv() }} className="text-nowrap btn btn-success btn-lg mt-3 mb-4">
                         Export Search Results</button>
                     </div>
                     <div className="col-2"></div>
@@ -337,34 +338,38 @@ function HomeSearch() {
                     </div>
                     <div className="col-2"></div>
                     <div className="col-2 d-flex justify-content-center">
-                        <button type="" className="text-nowrap btn btn-info btn-lg mt-3 mb-4">Location Information</button>
+                        {/* <button type="" className="text-nowrap btn btn-info btn-lg mt-3 mb-4">Location Information</button> */}
                     </div>
                     <div className="col-1"></div>
                 </div>
                 </form>
             </div>
             <div>
-                {propertyList.map((property) => ( 
+                {propertyList.sort((a,b) => totalRoi(b) - totalRoi(a)).map((property) => ( 
                     <div className="container fill main-container">
                         <div className="row property-container rounded"> 
-                            <div className="col-4 my-auto">
+                            <div className="col-3 my-auto">
                                 <h2 className="text-center">{property.address.line}</h2>
                                 <h3 className="text-center">{property.address.city}</h3>
                                 <h1 className="text-center">${currencyFormat(property.price)}</h1>
                                 <h3 className="text-center">{property.beds} Bed, {property.baths_full, property.baths} Bath</h3>
                             </div>
-                            <div className="col-4 my-auto">
+                            <div className="col-3 my-auto">
                                 <p className="bold text-left">Down Payment: ${currencyFormat(downpayment(property))}</p>
                                 <p className="bold text-left">Mortgage: ${currencyFormat(mortgage(property))}</p>
                                 <p className="bold text-left">Total Payment: ${currencyFormat(totalPayment(property))}</p>
                                 <p className="bold text-left">Total Expenses: ${currencyFormat(totalExpenses(property))}</p>
                             </div>
-                        
-                            <div className="col-4 my-auto">
+                            <div className="col-3 my-auto">
                                 <p className="bold text-left">Monthly Rent: ${currencyFormat(rent(property.beds, roomOrTotal, monthlyRent))}</p>
                                 <p className="bold text-left">Cash Flow: ${currencyFormat(cashFlow(property))}</p>
                                 <p className="bold text-left">Cash on Cash ROI: {currencyFormat(cocRoi(property))}%</p>
-                                <p className="bold text-left">Total ROI: {currencyFormat(totalRoi(property))}%</p>
+                                <p className="bold text-left font-large">Total ROI: <span 
+                                    style={{color: totalRoi(property) > 0 ? 'green' : 'red'}} className="text-shadow">
+                                    {currencyFormat(totalRoi(property))}%</span></p>
+                            </div>
+                            <div className="col-3 my-auto">
+                                <img src={placeholderImage} class="img-fluid" alt="Map placeholder"></img>
                             </div>
                         </div>
                     </div>
@@ -373,7 +378,8 @@ function HomeSearch() {
             <div className="row fixed-bottom">
                 <div className="col-5"></div>
                 <div className="col-2 d-flex justify-content-center">
-                    <button type="" onClick={scrollToTop} style={{display: scrollToTopVisible ? 'flex' : 'none'}} className="btn btn-dark btn-lg mb-2">Back to Top</button>
+                    <button type="" onClick={scrollToTop} style={{display: scrollToTopVisible ? 'flex' : 'none'}} 
+                    className="btn btn-dark btn-lg mb-2">Back to Top</button>
                 </div>
                 <div className="col-5"></div>
             </div>

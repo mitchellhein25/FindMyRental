@@ -89,3 +89,10 @@ label {
     color: green;
 }
 
+.font-large {
+    font-size: 1.8em;
+}
+
+.text-shadow {
+    text-shadow: 1px 1px black;
+}
