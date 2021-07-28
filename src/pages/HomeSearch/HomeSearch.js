@@ -253,7 +253,7 @@ function HomeSearch() {
     return (
         <div className="container fill main-container">
             <div className="row title-row">
-                <h1 className="title">Find My Rental</h1>
+                <h1 className="title">RentalPropertyReturn.com</h1>
             </div>      
             <div className="container fill search-body">
                 <div className="row sub-title-row">
@@ -337,9 +337,7 @@ function HomeSearch() {
                         <button type="submit" className="text-nowrap btn btn-danger btn-lg mt-3 mb-4">GET RESULTS</button>
                     </div>
                     <div className="col-2"></div>
-                    <div className="col-2 d-flex justify-content-center">
-                        {/* <button type="" className="text-nowrap btn btn-info btn-lg mt-3 mb-4">Location Information</button> */}
-                    </div>
+                    <div className="col-2 d-flex justify-content-center"></div>
                     <div className="col-1"></div>
                 </div>
                 </form>
