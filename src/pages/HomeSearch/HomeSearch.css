@@ -41,9 +41,9 @@ body {
   }
 
 .subTitle {
-    padding: 1.5% 0 1.5% 0;
-    border-top: 4px white solid;
-    border-bottom: 4px white solid;
+    /* padding: 1.5% 0 1.5% 0; */
+    /* border-top: 4px white solid;
+    border-bottom: 4px white solid; */
     display: flex;
     justify-content: center;
 }
@@ -95,4 +95,12 @@ label {
 
 .text-shadow {
     text-shadow: 1px 1px black;
+}
+
+.fixed-top {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: auto;
+    z-index: 1030;
 }
