@@ -22,7 +22,7 @@ function MortgageDetailsForm(props) {
                     <div className="col-4">
                         <div className="input-group">
                             <input className="form-control" type="number" aria-describedby="downPaymentPercentAppend" 
-                            value={props.downPaymentPercent} onChange={(e) => props.setDownPaymentPercent(e.target.value)}></input> 
+                            value={props.state.downPaymentPercent} onChange={e => props.setState({...props.state, downPaymentPercent: e.target.value})}></input> 
                             <div class="input-group-append">
                                 <span class="input-group-text" id="downPaymentPercentAppend">%</span>
                             </div>
@@ -38,11 +38,11 @@ function MortgageDetailsForm(props) {
                             <span class="input-group-text" id="downPaymentDollarPrepend">$</span>
                         </div>
                         <input className="form-control" type="number" aria-describedby="downPaymentDollarPrepend" 
-                        value={props.downPaymentTotal} onChange={(e) => props.setDownPaymentTotal(e.target.value)}></input>
+                        value={props.state.downPaymentTotal} onChange={e => props.setState({...props.state, downPaymentTotal: e.target.value})}></input>
                     </div>
                 </div>
                 <div className="col-1"></div>
-                <p className="text-center">{props.downPaymentWarning ? "Please only enter Percent or Total, not both." : null}</p>
+                <p className="text-center">{props.state.downPaymentWarning ? "Please only enter Percent or Total, not both." : null}</p>
             </div>
             </div>
 
@@ -54,7 +54,7 @@ function MortgageDetailsForm(props) {
                         </div>
                         <div className="input-group">
                             <input className="form-control" type="number" aria-describedby="interestRateAppend" 
-                            value={props.interestRate} onChange={(e) => props.setInterestRate(e.target.value)}></input>
+                            value={props.state.interestRate} onChange={e => props.setState({...props.state, interestRate: e.target.value})}></input>
                             <div class="input-group-append">
                                 <span class="input-group-text" id="interestRateAppend">%</span>
                             </div>
@@ -74,7 +74,7 @@ function MortgageDetailsForm(props) {
                                 <span class="input-group-text" id="homeInsureAppend">$</span>
                             </div>
                             <input className="form-control" type="number" aria-describedby="homeInsureAppend"
-                            value={props.homeInsure} onChange={(e) => props.setHomeInsure(e.target.value)}></input>
+                            value={props.state.homeInsure} onChange={e => props.setState({...props.state, homeInsure: e.target.value})}></input>
                         </div>
                     </div>
                 </div>
@@ -84,8 +84,8 @@ function MortgageDetailsForm(props) {
                             <label>Property Taxes</label>
                         </div>
                         <div className="input-group">
-                            <input className="form-control" type="number" value={props.propTax} aria-describedby="propTaxAppend" 
-                            onChange={(e) => props.setPropTax(e.target.value)}></input>
+                            <input className="form-control" type="number" value={props.state.propTax} aria-describedby="propTaxAppend" 
+                            onChange={e => props.setState({...props.state, propTax: e.target.value})}></input>
                             <div class="input-group-append">
                                 <span class="input-group-text" id="propTaxAppend">%</span>
                             </div>
@@ -105,18 +105,18 @@ function MortgageDetailsForm(props) {
                     <div className="col-6 d-flex justify-content-center">
                 <div className="form-check form-check-inline">
                     <label className="form-check-label"  htmlFor="ten-year">10</label>
-                    <input className="form-check-input" type="radio" name="loan-length" id="tenYear" checked={props.loanLength === 10}
-                    onChange={e => props.setLoanLength(10)}></input>
+                    <input className="form-check-input" type="radio" name="loan-length" id="tenYear" checked={props.state.loanLength === 10}
+                    onChange={e => props.setState({...props.state, loanLength: 10})}></input>
                 </div>
                 <div className="form-check form-check-inline">
                     <label className="form-check-label"  htmlFor="fifteen-year">15</label>
-                    <input className="form-check-input" type="radio" name="loan-length" id="fifteenYear" checked={props.loanLength === 15}
-                    onChange={e => props.setLoanLength(15)}></input>
+                    <input className="form-check-input" type="radio" name="loan-length" id="fifteenYear" checked={props.state.loanLength === 15}
+                    onChange={e => props.setState({...props.state, loanLength: 15})}></input>
                 </div>
                 <div className="form-check form-check-inline">
                     <label className="form-check-label"  htmlFor="thirty-year">30</label>
-                    <input className="form-check-input" type="radio" name="loan-length" id="thirtyYear" checked={props.loanLength === 30}
-                    onChange={e => props.setLoanLength(30)}></input>
+                    <input className="form-check-input" type="radio" name="loan-length" id="thirtyYear" checked={props.state.loanLength === 30}
+                    onChange={e => props.setState({...props.state, loanLength: 30})}></input>
                 </div>
                 </div>
                     <div className="col-3"></div>

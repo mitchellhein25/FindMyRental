@@ -25,7 +25,7 @@ function ExpensesForm(props) {
                             <span class="input-group-text" id="utilitiesPrepend">$</span>
                         </div>
                             <input className="form-control" type="number" aria-describedby="utilitiesPrepend"
-                            value={props.utilities} onChange={(e) => props.setUtilities(e.target.value)}></input>
+                            value={props.state.utilities} onChange={e => props.setState({...props.state, utilities: e.target.value})}></input>
                         </div>
                     </div>
                     <div className="col-4">
@@ -47,8 +47,8 @@ function ExpensesForm(props) {
                             </OverlayTrigger>
                         </div>
                         <div className="input-group">
-                            <input className="form-control" type="number"  aria-aria-describedby="vacancyAppend" 
-                            value={props.vacancy} onChange={(e) => props.setVacancy(e.target.value)}></input>
+                            <input className="form-control" type="number"  aria-describedby="vacancyAppend" 
+                            value={props.state.vacancy} onChange={e => props.setState({...props.state, vacancy: e.target.value})}></input>
                             <div class="input-group-append">
                                 <span class="input-group-text" id="vacancyAppend">%</span>
                             </div>
@@ -81,7 +81,7 @@ function ExpensesForm(props) {
                     </div>
                     <div className="input-group">
                         <input className="form-control" type="number" aria-describedby="capExAppend" 
-                        value={props.capEx} onChange={(e) => props.setCapEx(e.target.value)}></input>
+                        value={props.state.capEx} onChange={e => props.setState({...props.state, capEx: e.target.value})}></input>
                         <div class="input-group-append">
                             <span class="input-group-text" id="capExAppend">%</span>
                         </div>
@@ -92,7 +92,8 @@ function ExpensesForm(props) {
                         <label style={{fontSize: "1em"}}>Repairs/Maintenance</label>
                     </div>
                     <div className="input-group">
-                        <input className="form-control" type="number" aria-describedby="repMaintAppend" value={props.repairMaint} onChange={(e) => props.setRepairMaint(e.target.value)}></input>
+                        <input className="form-control" type="number" aria-describedby="repMaintAppend" value={props.state.repairMaint} 
+                        onChange={e => props.setState({...props.state, repairMaint: e.target.value})}></input>
                         <div class="input-group-append">
                             <span class="input-group-text" id="repMaintAppend">%</span>
                         </div>
@@ -117,7 +118,7 @@ function ExpensesForm(props) {
                             </OverlayTrigger>
                     </div>
                     <div className="input-group">
-                        <input className="form-control" type="number" value={props.other} onChange={(e) => props.setOther(e.target.value)}></input>
+                        <input className="form-control" type="number" value={props.state.other} onChange={e => props.setState({...props.state, other: e.target.value})}></input>
                         <div class="input-group-append">
                             <span class="input-group-text" id="repMaintAppend">%</span>
                         </div>

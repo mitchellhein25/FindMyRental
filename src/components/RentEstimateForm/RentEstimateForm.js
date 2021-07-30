@@ -41,8 +41,8 @@ function RentEstimateForm(props) {
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="rentDollarPrepend">$</span>
                             </div>
-                            <input className="form-control" type="number" aria-describedby="rentDollarPrepend" value={props.rentPerRoom} 
-                            default={500} onChange={(e) => props.setRentPerRoom(e.target.value)}></input>
+                            <input className="form-control" type="number" aria-describedby="rentDollarPrepend" value={props.state.rentPerRoom} 
+                            default={500} onChange={e => props.setState({...props.state, rentPerRoom: e.target.value})}></input>
                             
                         </div>
                         <small className="form-text text-muted">
@@ -57,7 +57,7 @@ function RentEstimateForm(props) {
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="rentDollarPrepend">$</span>
                             </div>
-                        <input className="form-control" type="number" value={props.totalRent} onChange={(e) => props.setTotalRent(e.target.value)}></input> 
+                        <input className="form-control" type="number" value={props.state.totalRent} onChange={e => props.setState({...props.state, totalRent: e.target.value})}></input> 
                         <div>
                             
                         </div>
@@ -68,7 +68,7 @@ function RentEstimateForm(props) {
                     </div>
                     <div className="col-1"></div>
                 </div>
-                <p className="text-center">{props.rentWarning ? "Please only enter Per Room or Total, not both." : null}</p>
+                <p className="text-center">{props.state.rentWarning ? "Please only enter Per Room or Total, not both." : null}</p>
             </div>
 
         </fieldset>

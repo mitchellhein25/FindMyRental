@@ -26,8 +26,8 @@ function PropertyDetailsForm(props) {
                     <div  className="col-6">
                     <div className="form-group">
                 <select className="form-control"
-                value={props.propType} onChange={e => props.setPropType(e.target.value)}>
-                    <option defaultValue>Choose...</option>
+                value={props.state.propType} onChange={e => props.setState({...props.state, propType: e.target.value})}>
+                    <option value="default" defaultValue>Choose...</option>
                     <option value="single_family">Single Family</option>
                     <option value="multi_family">Multi-Family</option>
                     <option value="condo">Condo</option>
@@ -55,7 +55,7 @@ function PropertyDetailsForm(props) {
                     <div className="form-group">
                         
                         <select className="form-control" type="number"
-                        value={props.priceMin} onChange={e => props.setPriceMin(parseInt(e.target.value))}>
+                        value={props.state.priceMin} onChange={e => props.setState({...props.state, priceMin: e.target.value})}>
                             <option defaultValue>Min</option>
                             <option value="0">0</option>
                             <option value="50000">$50,000</option>
@@ -74,13 +74,12 @@ function PropertyDetailsForm(props) {
                     
                     </div>
                     </div>
-                    {/* <div className="col-1" align="center">TO</div> */}
                     <div  className="col-3">
                     
                     
                     <div className="form-group">
                         <select className="form-control" type="number"
-                        value={props.priceMax} onChange={e => props.setPriceMax(parseInt(e.target.value))}>
+                        value={props.state.priceMax} onChange={e => props.setState({...props.state, priceMax: e.target.value})}>
                             <option defaultValue>Max</option>
                             <option value="0">0</option>
                             <option value="50000">$50,000</option>
@@ -114,23 +113,23 @@ function PropertyDetailsForm(props) {
                         <div className="d-flex justify-content-center">
                         <div className="form-check form-check-inline">
                             <label className="form-check-label" htmlFor="one-bed">1+</label>
-                            <input className="form-check-input" type="radio" id="oneBed" checked={props.beds === 1}
-                            onChange={e => props.setBeds(1)}></input>
+                            <input className="form-check-input" type="radio" id="oneBed" checked={props.state.beds === 1}
+                            onChange={e => props.setState({...props.state, beds: 1})}></input>
                         </div>
                         <div className="form-check form-check-inline">
                             <label className="form-check-label" htmlFor="two-bed">2+</label>
-                            <input className="form-check-input" type="radio" id="twoBed" checked={props.beds === 2}
-                            onChange={e => props.setBeds(2)}></input>
+                            <input className="form-check-input" type="radio" id="twoBed" checked={props.state.beds === 2}
+                            onChange={e => props.setState({...props.state, beds: 2})}></input>
                         </div>
                         <div className="form-check form-check-inline">
                             <label className="form-check-label" htmlFor="three-bed">3+</label>
-                            <input className="form-check-input" type="radio" id="threeBed" checked={props.beds === 3}
-                            onChange={e => props.setBeds(3)}></input>
+                            <input className="form-check-input" type="radio" id="threeBed" checked={props.state.beds === 3}
+                            onChange={e => props.setState({...props.state, beds: 3})}></input>
                         </div>
                         <div className="form-check form-check-inline">
                             <label className="form-check-label" htmlFor="four-bed">4+</label>
-                            <input className="form-check-input" type="radio" id="fourBed" checked={props.beds === 4}
-                            onChange={e => props.setBeds(4)}></input>
+                            <input className="form-check-input" type="radio" id="fourBed" checked={props.state.beds === 4}
+                            onChange={e => props.setState({...props.state, beds: 4})}></input>
                         </div>
                         </div>
                     </div>
@@ -150,23 +149,23 @@ function PropertyDetailsForm(props) {
                         <div className="d-flex justify-content-center">
                         <div className="form-check form-check-inline">
                             <label className="form-check-label" htmlFor="one-bath">1+</label>
-                            <input className="form-check-input" type="radio" id="oneBath" checked={props.baths === 1}
-                            onChange={e => props.setBaths(1)}></input>
+                            <input className="form-check-input" type="radio" id="oneBath" checked={props.state.baths === 1}
+                            onChange={e => props.setState({...props.state, baths: 1})}></input>
                         </div>
                         <div className="form-check form-check-inline">
                             <label className="form-check-label" htmlFor="two-bath">2+</label>
-                            <input className="form-check-input" type="radio" id="twoBath" checked={props.baths === 2}
-                            onChange={e => props.setBaths(2)}></input>
+                            <input className="form-check-input" type="radio" id="twoBath" checked={props.state.baths === 2}
+                            onChange={e => props.setState({...props.state, baths: 2})}></input>
                         </div>
                         <div className="form-check form-check-inline">
                             <label className="form-check-label" htmlFor="three-bath">3+</label>
-                            <input className="form-check-input" type="radio" id="threeBath" checked={props.baths === 3}
-                            onChange={e => props.setBaths(3)}></input>
+                            <input className="form-check-input" type="radio" id="threeBath" checked={props.state.baths === 3}
+                            onChange={e => props.setState({...props.state, baths: 3})}></input>
                         </div>
                         <div className="form-check form-check-inline">
                             <label className="form-check-label" htmlFor="four-bath">4+</label>
-                            <input className="form-check-input" type="radio" id="fourBath" checked={props.baths === 4}
-                            onChange={e => props.setBaths(4)}></input>
+                            <input className="form-check-input" type="radio" id="fourBath" checked={props.state.baths === 4}
+                            onChange={e => props.setState({...props.state, baths: 4})}></input>
                         </div>
                         </div>
                     </div>
@@ -180,8 +179,8 @@ function PropertyDetailsForm(props) {
                             <div className="text-center">
                                 <label><p>Zip Code</p></label>
                             </div>
-                            <input className="form-control" value={props.zip} 
-                            onChange={e => props.setZip(e.target.value)} type="text" pattern="[0-9]*"></input>
+                            <input className="form-control" value={props.state.zip} 
+                            onChange={e => props.setState({...props.state, zip: e.target.value})} type="text" pattern="[0-9]*"></input>
                         </div>
                     </div>
             <div className="col-4"></div>
