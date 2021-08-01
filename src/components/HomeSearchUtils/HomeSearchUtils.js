@@ -11,6 +11,7 @@ export function currencyFormat(x) {
         x = x.toFixed(2);
         return x.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // source: https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
     }
+    console.log("Currency:", x)
     return x;
 }
 

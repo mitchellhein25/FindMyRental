@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './HomeSearch.css';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
@@ -16,6 +16,8 @@ import { rent, currencyFormat, bathrooms} from '../../components/HomeSearchUtils
 function HomeSearch() {
 
     const [propertyList, setPropertyList] = useState([]);
+    // const [testPropertyList, setTestPropertyList] = useState([{'property': 'test1'}, {'propert': 'test2'}]);
+    // const [propListLinks, setPropListLinks] = useState({});
     const [scrollToTopVisible, setScrollToTopVisible] = useState(false);
 
     //Property Details  
@@ -105,45 +107,58 @@ function HomeSearch() {
     }
 
     function principal(property) {
+        // console.log('principal: ', property.price - (percentOrTotal === 'percent' ? property.price * (totalDownPayment/100) : totalDownPayment) )
         return property.price - (percentOrTotal === 'percent' ? property.price * (totalDownPayment/100) : totalDownPayment);
     }
 
     function firstExp() {
+        // console.log('firstExp: ', ((interestRate/100)/12) * Math.pow((1+((interestRate/100)/12)), loanLength*12))
         return ((interestRate/100)/12) * Math.pow((1+((interestRate/100)/12)), loanLength*12);
     }
     
     function secondExp() {
+        // console.log('secondExp: ', Math.pow(1+((interestRate/100)/12), loanLength*12) - 1);
         return Math.pow(1+((interestRate/100)/12), loanLength*12) - 1;
     }
 
     function mortgage(property) {
+        // console.log('mortgage: ', (principal(property) * firstExp()) / secondExp());
         return (principal(property) * firstExp()) / secondExp();
     }
 
     function downpayment(property) {
+        // console.log('downpayment:', percentOrTotal === 'percent' ? property.price * (totalDownPayment/100) : totalDownPayment);
         return percentOrTotal === 'percent' ? property.price * (totalDownPayment/100) : totalDownPayment;
     }
 
     function totalPayment(property) {
+        // console.log('totalPayment:', parseFloat(mortgage(property)) + 
+        // parseFloat(homeInsure) + parseFloat(((propTax/100)*property.price)/12));
         return parseFloat(mortgage(property)) + 
         parseFloat(homeInsure) + parseFloat(((propTax/100)*property.price)/12);
     }
 
     function totalExpenses(property) {
+        // console.log('totalExpenses:', parseFloat(utilities) + parseFloat(((vacancy/100) * monthlyRent)) + parseFloat((((repairMaint/100) * property.price)/12)) + 
+        // parseFloat((((capEx/100) * property.price)/12)) + parseFloat((((other/100) * property.price)/12)));
         return parseFloat(utilities) + parseFloat(((vacancy/100) * monthlyRent)) + parseFloat((((repairMaint/100) * property.price)/12)) + 
         parseFloat((((capEx/100) * property.price)/12)) + parseFloat((((other/100) * property.price)/12));
     }
     
     function cashFlow(property) {
+        // console.log('cashFlow:', rent(property.beds, roomOrTotal, monthlyRent) - (parseFloat(totalExpenses(property)) + 
+        // parseFloat(totalPayment(property))));
         return rent(property.beds, roomOrTotal, monthlyRent) - (parseFloat(totalExpenses(property)) + 
         parseFloat(totalPayment(property)));
     }
 
     function cocRoi(property) {
+        // console.log('cocRoi:', (cashFlow(property) * 12) / (downpayment(property) + (property.price*.03)) * 100);
         return (cashFlow(property) * 12) / (downpayment(property) + (property.price*.03)) * 100;
     }
 
     function totalRoi(property) {
+        // console.log('totalRoi:', ((cashFlow(property) * 12) + (property.price*.02) + (property.price*.01)) / (downpayment(property) + (property.price*.03)) * 100)
         return ((cashFlow(property) * 12) + (property.price*.02) + (property.price*.01)) / (downpayment(property) + (property.price*.03)) * 100;
     }
     
@@ -193,29 +208,89 @@ function HomeSearch() {
         
     })
 
-    const getGeoLink = (e) => {
-        //Get the properties based on details
-        e.preventDefault();
-        
+    const testFunction = (property) => {
+        console.log(`${property.address.line},${property.address.city},${property.address.state}`);
         var options = {
             method: 'GET',
             url: 'http://map-api-dan.herokuapp.com/link',
             params: {
-                'address': '3813 Oldenburg Lane, College Station, TX' ,
+                'address': `${property.address.line},${property.address.city},${property.address.state}`
             },
             headers: {
-                'Content-Type': 'text/plain'
-            //   'x-rapidapi-key': '6d2e6db3c4msh2b3e81fd83339e4p1a705fjsncb84d9f6b95b',
-            //   'x-rapidapi-host': 'realty-in-us.p.rapidapi.com'
+                'Content-Type': 'text/plain',
+                // "Content-Type": "application/json",
+                // "Access-Control-Allow-Origin": "*"
             }
         };
 
         axios.request(options).then(function (response) {
-            console.log(response)
+            // console.log(response.data);
+            window.open(response.data, '_blank');
         }).catch(function (error) {
             console.error(error);
         });
     }
+
+    // const testFunction = ( ) => {
+    //     console.log('running')
+    // }
+
+    // const goToLink = useCallback((e, property) => {
+    //     console.log(`${property.address.line},${property.address.city},${property.address.state}`);
+    //     e.preventDefault();
+    //     var options = {
+    //         method: 'GET',
+    //         url: 'http://map-api-dan.herokuapp.com/link',
+    //         params: {
+    //             'address': `${property.address.line},${property.address.city},${property.address.state}`
+    //         },
+    //         headers: {
+    //             'Content-Type': 'text/plain',
+    //             // "Content-Type": "application/json",
+    //             "Access-Control-Allow-Origin": "*"
+    //         }
+    //     };
+
+    //     axios.request(options).then(function (response) {
+    //         console.log(response.data);
+    //         window.location.href = response.data;
+    //     }).catch(function (error) {
+    //         console.error(error);
+    //     });
+    // }, [], );
+
+    // const getGeoMap = (property) => {
+        
+    //     var options = {
+    //         method: 'GET',
+    //         url: 'http://map-api-dan.herokuapp.com/map',
+    //         params: {
+    //             'address': `${property.address.line},${property.address.city},${property.address.state}`,
+    //         },
+    //         headers: {
+    //             'Content-Type': 'text/plain',
+    //             // "Content-Type": "application/json",
+    //             "Access-Control-Allow-Origin": "*"
+    //         }
+    //     };
+
+    //     axios.request(options).then(function (response) {
+    //         console.log(response.data);
+    //         return response.data;
+    //     }).catch(function (error) {
+    //         console.error(error);
+    //     });
+    // }
+
+    // const getPropLinks = () => {
+    //     var list = {}
+    //     for (var prop in propertyList) {
+    //         list[prop.property_id] = getGeoLink(prop);
+    //     }
+    //     console.log(list);     
+        
+    //     return list
+    // }
 
     const handleSubmit = (e) => {
 
@@ -228,7 +303,7 @@ function HomeSearch() {
             params: {
                 postal_code: zip,
                 offset: '0',
-                limit: '1000',
+                limit: '10',
                 sort: 'newest',
                 prop_type: propType,
                 baths_min: baths,
@@ -313,14 +388,19 @@ function HomeSearch() {
         <div className="container-fluid fill main-container">
             <div className="row title-row">
                 <h1 className="title">RentalPropertyReturn.com</h1>
-            </div>      
+                {/* <div style= "width:100%;">
+    <div style="position:relative;width:100%;height:0;padding-bottom:60%;"><span style="color:#565656">Make this Notebook Trusted to load map: File - Trust Notebook</span>
+        <iframe src="about:blank" style= {{position:"absolute",width:"100%",height:"100%",left:"0",top:"0",border:"none !important"}} data-html="%3C%21DOCTYPE%20html%3E%0A%3Chead%3E%20%20%20%20%0A%20%20%20%20%3Cmeta%20http-equiv%3D%22content-type%22%20content%3D%22text/html%3B%20charset%3DUTF-8%22%20/%3E%0A%20%20%20%20%0A%20%20%20%20%20%20%20%20%3Cscript%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20L_NO_TOUCH%20%3D%20false%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20L_DISABLE_3D%20%3D%20false%3B%0A%20%20%20%20%20%20%20%20%3C/script%3E%0A%20%20%20%20%0A%20%20%20%20%3Cstyle%3Ehtml%2C%20body%20%7Bwidth%3A%20100%25%3Bheight%3A%20100%25%3Bmargin%3A%200%3Bpadding%3A%200%3B%7D%3C/style%3E%0A%20%20%20%20%3Cstyle%3E%23map%20%7Bposition%3Aabsolute%3Btop%3A0%3Bbottom%3A0%3Bright%3A0%3Bleft%3A0%3B%7D%3C/style%3E%0A%20%20%20%20%3Cscript%20src%3D%22https%3A//cdn.jsdelivr.net/npm/leaflet%401.6.0/dist/leaflet.js%22%3E%3C/script%3E%0A%20%20%20%20%3Cscript%20src%3D%22https%3A//code.jquery.com/jquery-1.12.4.min.js%22%3E%3C/script%3E%0A%20%20%20%20%3Cscript%20src%3D%22https%3A//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js%22%3E%3C/script%3E%0A%20%20%20%20%3Cscript%20src%3D%22https%3A//cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js%22%3E%3C/script%3E%0A%20%20%20%20%3Clink%20rel%3D%22stylesheet%22%20href%3D%22https%3A//cdn.jsdelivr.net/npm/leaflet%401.6.0/dist/leaflet.css%22/%3E%0A%20%20%20%20%3Clink%20rel%3D%22stylesheet%22%20href%3D%22https%3A//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css%22/%3E%0A%20%20%20%20%3Clink%20rel%3D%22stylesheet%22%20href%3D%22https%3A//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css%22/%3E%0A%20%20%20%20%3Clink%20rel%3D%22stylesheet%22%20href%3D%22https%3A//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css%22/%3E%0A%20%20%20%20%3Clink%20rel%3D%22stylesheet%22%20href%3D%22https%3A//cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css%22/%3E%0A%20%20%20%20%3Clink%20rel%3D%22stylesheet%22%20href%3D%22https%3A//cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css%22/%3E%0A%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cmeta%20name%3D%22viewport%22%20content%3D%22width%3Ddevice-width%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20initial-scale%3D1.0%2C%20maximum-scale%3D1.0%2C%20user-scalable%3Dno%22%20/%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cstyle%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23map_3da15fe3f18e49fcb17664fd63d1e53b%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20relative%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20100.0%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20height%3A%20100.0%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20left%3A%200.0%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20top%3A%200.0%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C/style%3E%0A%20%20%20%20%20%20%20%20%0A%3C/head%3E%0A%3Cbody%3E%20%20%20%20%0A%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22folium-map%22%20id%3D%22map_3da15fe3f18e49fcb17664fd63d1e53b%22%20%3E%3C/div%3E%0A%20%20%20%20%20%20%20%20%0A%3C/body%3E%0A%3Cscript%3E%20%20%20%20%0A%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20var%20map_3da15fe3f18e49fcb17664fd63d1e53b%20%3D%20L.map%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22map_3da15fe3f18e49fcb17664fd63d1e53b%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20center%3A%20%5B30.56091656819136%2C%20-96.2991260868098%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20crs%3A%20L.CRS.EPSG3857%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20zoom%3A%2018%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20zoomControl%3A%20true%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20preferCanvas%3A%20false%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%29%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%0A%0A%20%20%20%20%20%20%20%20%0A%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20var%20tile_layer_ec32dd9a5984412ba3a2261eec82cbf6%20%3D%20L.tileLayer%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22https%3A//%7Bs%7D.tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B%22attribution%22%3A%20%22Data%20by%20%5Cu0026copy%3B%20%5Cu003ca%20href%3D%5C%22http%3A//openstreetmap.org%5C%22%5Cu003eOpenStreetMap%5Cu003c/a%5Cu003e%2C%20under%20%5Cu003ca%20href%3D%5C%22http%3A//www.openstreetmap.org/copyright%5C%22%5Cu003eODbL%5Cu003c/a%5Cu003e.%22%2C%20%22detectRetina%22%3A%20false%2C%20%22maxNativeZoom%22%3A%2018%2C%20%22maxZoom%22%3A%2018%2C%20%22minZoom%22%3A%200%2C%20%22noWrap%22%3A%20false%2C%20%22opacity%22%3A%201%2C%20%22subdomains%22%3A%20%22abc%22%2C%20%22tms%22%3A%20false%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%29.addTo%28map_3da15fe3f18e49fcb17664fd63d1e53b%29%3B%0A%20%20%20%20%20%20%20%20%0A%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20var%20marker_65e37fa4aa324f259396dd53640b98ee%20%3D%20L.marker%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5B30.56091656819136%2C%20-96.2991260868098%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%29.addTo%28map_3da15fe3f18e49fcb17664fd63d1e53b%29%3B%0A%20%20%20%20%20%20%20%20%0A%20%20%20%20%0A%20%20%20%20%20%20%20%20var%20popup_7d36971b229441e985efd775b7213855%20%3D%20L.popup%28%7B%22maxWidth%22%3A%20%22100%25%22%7D%29%3B%0A%0A%20%20%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20var%20html_78a66d9e5144473fab69dc3e811b34af%20%3D%20%24%28%60%3Cdiv%20id%3D%22html_78a66d9e5144473fab69dc3e811b34af%22%20style%3D%22width%3A%20100.0%25%3B%20height%3A%20100.0%25%3B%22%3E%3Ci%3E3813%20Oldenburg%20Lane%2CCollege%20Station%2CTX%3C/i%3E%3C/div%3E%60%29%5B0%5D%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20popup_7d36971b229441e985efd775b7213855.setContent%28html_78a66d9e5144473fab69dc3e811b34af%29%3B%0A%20%20%20%20%20%20%20%20%0A%0A%20%20%20%20%20%20%20%20marker_65e37fa4aa324f259396dd53640b98ee.bindPopup%28popup_7d36971b229441e985efd775b7213855%29%0A%20%20%20%20%20%20%20%20%3B%0A%0A%20%20%20%20%20%20%20%20%0A%20%20%20%20%0A%3C/script%3E"
+        onload="this.contentDocument.open();this.contentDocument.write(    decodeURIComponent(this.getAttribute('data-html')));this.contentDocument.close();" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+    </div>
+</div> */}
+            </div>    
             <div className="container-fluid fill search-body">
                 <div className="row sub-title-row gx-0 mt-5">
-                    <div className={(propertyList.length > 0  && (height > 700 && width > 1450)) ? 'col-1' : 'col-3'}></div>
+                    <div className={(propertyList.length > 0 && (height > 700 && width > 1450)) ? 'col-1' : 'col-3'}></div>
 
                     <div className="col-3 d-flex justify-content-center">
-                        <button type="" onClick={(e) => {clearForm()}} className="btn btn-dark btn-lg">Reset all fields</button>
-                        <button type="" onClick={(e) => {getGeoLink(e)}} className="btn btn-dark btn-lg">Test GeoCode</button>
+                        <button type="button" onClick={(e) => {clearForm()}} className="btn btn-dark btn-lg">Reset all fields</button>
                     </div>
 
                     <div className="col-3 d-flex justify-content-center">
@@ -366,6 +446,14 @@ function HomeSearch() {
                         </div>
                         
                     </div>
+                    {/* <div>
+                        {propertyList.map((property) => (
+                            <>
+                            <p>{property['property']}</p>
+                            <button type="button" onClick={(e) => {testFunction(e, property)}} className="btn btn-dark btn-lg">Test GeoCode</button>
+                            </>
+                        ))}
+                    </div> */}
                     <div className="row">
                         <div className="col-1"></div>
                         <div className="col-2 d-flex justify-content-center">
@@ -381,7 +469,7 @@ function HomeSearch() {
                         <div className="col-1"></div>
                     </div>
 
-                    <div className="col-12 " style={{display: (propertyList.length > 0 && (height < 700 || width < 1450)) ? 'inline' : 'none', backgroundColor: 'rgba(0, 0, 0, 0.3)'}} >
+                 <div className="col-12 " style={{display: (propertyList.length > 0 && (height < 700 || width < 1450)) ? 'inline' : 'none', backgroundColor: 'rgba(0, 0, 0, 0.3)'}} >
 
                         <RentEstimateForm
                             rentPerRoom = {rentPerRoom}
@@ -420,9 +508,8 @@ function HomeSearch() {
                             setOther = {setOther}
                         />
 
-                    </div>
-                
-                    <div className ="row"></div>
+                    </div> 
+                  <div className ="row"></div>
                     <div className={(propertyList.length > 0 && height > 700 && width > 1450) ? "col-8" : "col-12"}>
                         {propertyList.sort((a,b) => totalRoi(b) - totalRoi(a)).map((property) => ( 
                             <div className="container fill main-container">
@@ -449,14 +536,19 @@ function HomeSearch() {
                                             {currencyFormat(totalRoi(property))}%</span></p>
                                     </div>
                                     <div className="col-3 my-auto">
-                                        <img src={placeholderImage} class="img-fluid" alt="Map placeholder"></img>
+                                        <p>{property.address.line},{property.address.city},{property.address.state}</p>
+                                        <button type="button" onClick={() => testFunction(property)} className="btn btn-dark btn-lg mb-2">Go to Link</button>
+                                        {/* {"Links List:", console.log(propListLinks)}
+                                        {console.log(propertyList)}  */}
+                                        {/* <a class="link-primary" href={testFunction(property)}>Click Me.</a> */}
+                                        {/* <img src={placeholderImage} class="img-fluid" alt="Map placeholder"></img> */}
                                     </div>
                                 </div>
                             </div>
                         ))}
-                    </div>
+                        </div> 
                     <div className="col-4 fixed-top" style={{display: (propertyList.length > 0 && height > 700 && width > 1450) ? 'inline' : 'none', backgroundColor: 'rgba(0, 0, 0, 0.3)'}} >
-
+                        <div style={{backgroundColor: 'rgba(0, 0, 0, 0.3)'}}>
                         <RentEstimateForm
                             rentPerRoom = {rentPerRoom}
                             setRentPerRoom = {setRentPerRoom}
@@ -493,7 +585,7 @@ function HomeSearch() {
                             other = {other}
                             setOther = {setOther}
                         />
-
+                        </div>
                     </div>
                     <div className="row fixed-bottom">
                         <div className="col-5"></div>
