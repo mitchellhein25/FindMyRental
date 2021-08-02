@@ -1,6 +1,7 @@
 import React from 'react';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Helmet } from 'react-helmet';
 
 import HomeSearch from "./pages/HomeSearch/HomeSearch";
 
@@ -14,6 +15,9 @@ function App() {
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
           crossorigin="anonymous"
         />
+        <Helmet>
+          <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"></meta>
+        </Helmet>
         <Switch>
           <Route path="/" exact component={HomeSearch} />
           {/* <Route path="/" exact component={SearchResults} /> */}
