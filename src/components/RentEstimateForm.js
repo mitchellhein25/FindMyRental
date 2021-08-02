@@ -13,7 +13,7 @@ function RentEstimateForm(props) {
         <fieldset>
             <div className="row sub-title-row mt-5 mb-0">
                 <div className="col-2">
-                < InfoToolTipIcon height={40} weight={40} side={'left'} text={toolTip}/>
+                < InfoToolTipIcon height={40} weight={40} side={props.height < 700 || props.width < 1450 ? 'right' : 'left'} text={toolTip} />
                 </div>
                 <div className="col-8">
                     <legend><h4 className="subTitle">{monthlyRentEst}</h4></legend>

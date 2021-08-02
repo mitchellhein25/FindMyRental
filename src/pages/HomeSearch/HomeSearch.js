@@ -374,6 +374,8 @@ function HomeSearch() {
                             totalRent = {totalRent}
                             setTotalRent = {setTotalRent}
                             rentWarning = {rentWarning}
+                            height={height}
+                            width={width}
                         />
 
                         <MortgageDetailsForm 
