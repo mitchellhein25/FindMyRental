@@ -266,7 +266,7 @@ function HomeSearch() {
             params: {
                 postal_code: state.zip,
                 offset: '0',
-                limit: '10',
+                limit: '50',
                 sort: 'newest',
                 prop_type: state.propType,
                 baths_min: state.baths,
