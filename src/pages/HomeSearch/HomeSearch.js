@@ -213,7 +213,7 @@ function HomeSearch() {
         console.log(`${property.address.line},${property.address.city},${property.address.state}`);
         var options = {
             method: 'GET',
-            url: 'http://map-api-dan.herokuapp.com/link',
+            url: 'https://map-api-dan.herokuapp.com/link',
             params: {
                 'address': `${property.address.line},${property.address.city},${property.address.state}`
             },
@@ -224,7 +224,11 @@ function HomeSearch() {
 
         axios.request(options).then(function (response) {
             // console.log(response.data);
-            window.open(response.data, '_blank');
+            if (response.data === "If you are seeing this, your address was likely invalid.") {
+                alert("We were not able to get the Google maps link for this address.")
+            } else {
+                window.open(response.data, '_blank');
+            }
         }).catch(function (error) {
             console.error(error);
         });
@@ -234,7 +238,7 @@ function HomeSearch() {
         
         var options = {
             method: 'GET',
-            url: 'http://map-api-dan.herokuapp.com/map',
+            url: 'https://map-api-dan.herokuapp.com/map',
             params: {
                 'address': `${property.address.line},${property.address.city},${property.address.state}`
             },
@@ -246,7 +250,8 @@ function HomeSearch() {
         axios.request(options).then(function (response) {
             console.log(response.data)
             if (response.data === "If you are seeing this, your address was likely invalid.") {
-                element.innerHTML = 'Map failed to load. Click "See on Google Maps" to see the property location.'
+                element.innerHTML = 'The map for this location failed to load.'
+                element.style.textAlign = "center";
             } else {
                 element.innerHTML = response.data
             }
@@ -266,7 +271,7 @@ function HomeSearch() {
             params: {
                 postal_code: state.zip,
                 offset: '0',
-                limit: '50',
+                limit: '20',
                 sort: 'newest',
                 prop_type: state.propType,
                 baths_min: state.baths,

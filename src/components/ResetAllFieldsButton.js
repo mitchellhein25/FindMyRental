@@ -1,7 +1,7 @@
 
 export default function ResetAllFieldsButton(props) {
 
-    function clearForm () {
+    const clearForm = () => {
 
         props.setState({
             ...props.state,
@@ -21,26 +21,20 @@ export default function ResetAllFieldsButton(props) {
             repairMaint: "",
             capEx: "",
             other: ""
-        })
-
+        });
+        
         //Rent Estimate
-        props.setMonthlyRent("");
-        props.setRentPerRoom("");
-        props.setTotalRent("");
-        props.setRoomOrTotal("");
-        props.setRentWarning(false);
+        // props.setMonthlyRent("");
+        // props.setRentPerRoom("");
 
         //Mortgage Details
-        props.setDownPaymentPercent("");
-        props.setDownPaymentTotal("");
-        props.setTotalDownPayment("");
-        props.setPercentOrTotal("");
-        props.setDownPaymentWarning("");
+        // props.setDownPaymentPercent("");
+        // props.setDownPaymentTotal("");
     }
 
     return (
         <div className="col-3 d-flex justify-content-center">
-            <div type="button" onClick={clearForm} className="btn btn-dark btn-lg">Reset all fields</div>
+            <button type="button" onClick={() => clearForm()} className="btn btn-dark btn-lg">Reset all fields</button>
         </div>
     )
 }
