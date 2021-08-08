@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import InfoToolTipIcon from './InfoToolTipIcon';
 
 function RentEstimateForm(props) {
@@ -8,6 +9,28 @@ function RentEstimateForm(props) {
     const perRoom = 'Per Room';
     const total = 'Total';
     const warningMessage = 'Please only enter Per Room or Total, not both.';
+
+    useEffect(() => {
+        //Calculate Rent
+        if (props.rentPerRoom === 0 || props.rentPerRoom === "") {
+            props.setRentPerRoom(null);
+        }
+        if (props.totalRent === 0 || props.totalRent === "") {
+            props.setTotalRent(null);
+        }
+        if (props.rentPerRoom != null && props.totalRent != null) {
+            props.setRentWarning(true)
+            props.setMonthlyRent(null);
+        } else if (props.rentPerRoom === null ) {
+            props.setRentWarning(false)
+            props.setRoomOrTotal("total");
+            props.setMonthlyRent(props.totalRent);
+        } else {
+            props.setRentWarning(false)
+            props.setRoomOrTotal("room");
+            props.setMonthlyRent(props.rentPerRoom);
+        }
+    });
 
     return (
         <fieldset>

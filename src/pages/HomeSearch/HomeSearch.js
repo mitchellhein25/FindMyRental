@@ -75,7 +75,10 @@ function HomeSearch() {
       
         return windowDimensions;
       }
-
+    
+    //This function takes in all of the property information, including address line, city, price, beds, baths
+    // downpayment, mortgage, total payment, total expenses, rent, cashflow, cash on cash return on investment, total return on investment
+    // and converts to CSV. It is immediately downloaded to the users computer.
     const toCsv = () => {
         var propertyArray = [];
         state.propertyList.map((property) => (
@@ -127,8 +130,12 @@ function HomeSearch() {
     }
 
     function totalExpenses(property) {
-        return parseFloat(state.utilities) + parseFloat(((state.vacancy/100) * monthlyRent)) + parseFloat((((state.repairMaint/100) * property.price)/12)) + 
-        parseFloat((((state.capEx/100) * property.price)/12)) + parseFloat((((state.other/100) * property.price)/12));
+        var utilities = parseFloat(state.utilities);
+        var vacancy = parseFloat(((state.vacancy/100) * monthlyRent));
+        var repairMaint = parseFloat((((state.repairMaint/100) * property.price)/12));
+        var capEx = parseFloat((((state.capEx/100) * property.price)/12));
+        var other = parseFloat((((state.other/100) * property.price)/12));
+        return  utilities + vacancy + repairMaint + capEx + other;
     }
     
     function cashFlow(property) {
@@ -148,63 +155,21 @@ function HomeSearch() {
 
         if (state.propertyList !== []) {
             for (var index in state.propertyList) {
-                var element = document.getElementById(state.propertyList[index].property_id)
-        
-                if (element != null ) {
-                    if (element.innerHTML !== null && element.innerHTML !== "") {
+                var mapPhoto = document.getElementById(state.propertyList[index].property_id)
+                
+                if (mapPhoto != null ) {
+                    if (mapPhoto.innerHTML !== null && mapPhoto.innerHTML !== "") {
                         return
                     } else {
                         try {
-                            getMapPhoto(state.propertyList[index], element)
+                            getMapPhoto(state.propertyList[index], mapPhoto)
                         } catch {
-                            getMapPhoto(state.propertyList[index], element)
+                            getMapPhoto(state.propertyList[index], mapPhoto)
                         }
                         
                     }
                 }
             }
-        }
-
-        //Calculate Rent
-        if (rentPerRoom === 0 || rentPerRoom === "") {
-            setRentPerRoom(null);
-        }
-        if (totalRent === 0 || totalRent === "") {
-            setTotalRent(null);
-        }
-        if (rentPerRoom != null && totalRent != null) {
-            setRentWarning(true)
-            setMonthlyRent(null);
-            window.history.back();
-        } else if (rentPerRoom === null ) {
-            setRentWarning(false)
-            setRoomOrTotal("total");
-            setMonthlyRent(totalRent);
-        } else {
-            setRentWarning(false)
-            setRoomOrTotal("room");
-            setMonthlyRent(rentPerRoom);
-        }
-
-        //Calculate Downpayment
-        if (downPaymentPercent === 0 || downPaymentPercent === "") {
-            setDownPaymentPercent(null);
-        }
-        if (downPaymentTotal === 0 || downPaymentTotal === "") {
-            setDownPaymentTotal(null);
-        }
-        if (downPaymentPercent != null && downPaymentTotal != null) {
-            setDownPaymentWarning(true)
-            setTotalDownPayment(null);
-            window.history.back();
-        } else if (downPaymentPercent === null ) {
-            setDownPaymentWarning(false)
-            setPercentOrTotal("total");
-            setTotalDownPayment(downPaymentTotal);
-        } else {
-            setDownPaymentWarning(false)
-            setPercentOrTotal("percent");
-            setTotalDownPayment(downPaymentPercent);
         }
         
     })
@@ -286,7 +251,11 @@ function HomeSearch() {
         };
 
         axios.request(options).then(function (response) {
-            setState({...state, propertyList: response.data.properties});
+            if (response.data.properties === []) {
+                alert("There were no properties that matched your search.")
+            } else {
+                setState({...state, propertyList: response.data.properties});
+            }
         }).catch(function (error) {
             console.error(error);
         });
@@ -328,16 +297,6 @@ function HomeSearch() {
                     <ResetAllFieldsButton 
                         setState = {setState}
                         state = {state}
-                        setMonthlyRent = {setMonthlyRent}
-                        setRentPerRoom = {setRentPerRoom}
-                        setTotalRent = {setTotalRent}
-                        setRoomOrTotal = {setRoomOrTotal}
-                        setRentWarning = {setRentWarning}
-                        setDownPaymentPercent = {setDownPaymentPercent}
-                        setDownPaymentTotal = {setDownPaymentTotal}
-                        setTotalDownPayment = {setTotalDownPayment}
-                        setPercentOrTotal = {setPercentOrTotal}
-                        setDownPaymentWarning = {setDownPaymentWarning}
                     />
 
                     <div className="col-3 d-flex justify-content-center">
@@ -379,6 +338,9 @@ function HomeSearch() {
                             totalRent = {totalRent}
                             setTotalRent = {setTotalRent}
                             rentWarning = {rentWarning}
+                            setRentWarning = {setRentWarning}
+                            setRoomOrTotal = {setRoomOrTotal}
+                            setMonthlyRent = {setMonthlyRent}
                             height={height}
                             width={width}
                         />
@@ -389,6 +351,9 @@ function HomeSearch() {
                             downPaymentTotal = {downPaymentTotal}
                             setDownPaymentTotal = {setDownPaymentTotal}
                             downPaymentWarning = {downPaymentWarning}
+                            setTotalDownPayment = {setTotalDownPayment}
+                            setPercentOrTotal = {setPercentOrTotal}
+                            setDownPaymentWarning = {setDownPaymentWarning}
                             state = {state}
                             setState = {setState}
                         />
@@ -465,6 +430,11 @@ function HomeSearch() {
                             totalRent = {totalRent}
                             setTotalRent = {setTotalRent}
                             rentWarning = {rentWarning}
+                            setRentWarning = {setRentWarning}
+                            setRoomOrTotal = {setRoomOrTotal}
+                            setMonthlyRent = {setMonthlyRent}
+                            height={height}
+                            width={width}
                         />
                         
                         <MortgageDetailsForm 
@@ -473,6 +443,9 @@ function HomeSearch() {
                             downPaymentTotal = {downPaymentTotal}
                             setDownPaymentTotal = {setDownPaymentTotal}
                             downPaymentWarning = {downPaymentWarning}
+                            setTotalDownPayment = {setTotalDownPayment}
+                            setPercentOrTotal = {setPercentOrTotal}
+                            setDownPaymentWarning = {setDownPaymentWarning}
                             state = {state}
                             setState = {setState}
                         />

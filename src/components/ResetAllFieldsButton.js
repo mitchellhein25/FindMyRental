@@ -12,24 +12,8 @@ export default function ResetAllFieldsButton(props) {
             beds: "",
             baths: "",
             zip: "",
-            interestRate: "",
-            homeInsure: "",
-            propTax: "",
-            loanLength: "",
-            utilities: "",
-            vacancy: "",
-            repairMaint: "",
-            capEx: "",
-            other: ""
         });
         
-        //Rent Estimate
-        // props.setMonthlyRent("");
-        // props.setRentPerRoom("");
-
-        //Mortgage Details
-        // props.setDownPaymentPercent("");
-        // props.setDownPaymentTotal("");
     }
 
     return (

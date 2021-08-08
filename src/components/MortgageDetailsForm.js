@@ -1,4 +1,4 @@
-
+import React, { useEffect } from 'react';
 function MortgageDetailsForm(props) {
 
     const title = 'Monthly Mortgage Details';
@@ -8,6 +8,28 @@ function MortgageDetailsForm(props) {
     const propTax = 'Property Taxes';
     const loanTermLength = 'Loan Term Length (years)';
     const warning = 'Please only enter Percent or Total, not both.';
+
+    useEffect(() => {
+        //Calculate Downpayment
+        if (props.downPaymentPercent === 0 || props.downPaymentPercent === "") {
+            props.setDownPaymentPercent(null);
+        }
+        if (props.downPaymentTotal === 0 || props.downPaymentTotal === "") {
+            props.setDownPaymentTotal(null);
+        }
+        if (props.downPaymentPercent != null && props.downPaymentTotal != null) {
+            props.setDownPaymentWarning(true)
+            props.setTotalDownPayment(null);
+        } else if (props.downPaymentPercent === null ) {
+            props.setDownPaymentWarning(false)
+            props.setPercentOrTotal("total");
+            props.setTotalDownPayment(props.downPaymentTotal);
+        } else {
+            props.setDownPaymentWarning(false)
+            props.setPercentOrTotal("percent");
+            props.setTotalDownPayment(props.downPaymentPercent);
+        }
+    });
 
     return (
 
