@@ -7,6 +7,9 @@ export function rent(beds, roomOrTotal, monthlyRent) {
 }
 
 export function currencyFormat(x) {
+    if (typeof(x) == 'string') {
+        x = parseInt(x);
+    }
     if (x) {
         x = x.toFixed(2);
         return x.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // source: https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript

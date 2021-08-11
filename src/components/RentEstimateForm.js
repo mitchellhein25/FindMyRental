@@ -19,14 +19,16 @@ function RentEstimateForm(props) {
             props.setTotalRent(null);
         }
         if (props.rentPerRoom != null && props.totalRent != null) {
-            props.setRentWarning(true)
+            props.setRentWarning(true);
             props.setMonthlyRent(null);
+        } else if (props.rentPerRoom === null && props.totalRent === null){
+            props.setMonthlyRent(0);
         } else if (props.rentPerRoom === null ) {
-            props.setRentWarning(false)
+            props.setRentWarning(false);
             props.setRoomOrTotal("total");
             props.setMonthlyRent(props.totalRent);
-        } else {
-            props.setRentWarning(false)
+        } else if (props.totalRent === null ) {
+            props.setRentWarning(false);
             props.setRoomOrTotal("room");
             props.setMonthlyRent(props.rentPerRoom);
         }

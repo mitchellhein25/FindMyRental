@@ -20,11 +20,13 @@ function MortgageDetailsForm(props) {
         if (props.downPaymentPercent != null && props.downPaymentTotal != null) {
             props.setDownPaymentWarning(true)
             props.setTotalDownPayment(null);
-        } else if (props.downPaymentPercent === null ) {
+        } else if (props.downPaymentPercent === null && props.downPaymentTotal === null){
+            props.setTotalDownPayment(0);
+        }else if (props.downPaymentPercent === null ) {
             props.setDownPaymentWarning(false)
             props.setPercentOrTotal("total");
             props.setTotalDownPayment(props.downPaymentTotal);
-        } else {
+        } else if (props.downPaymentTotal === null) {
             props.setDownPaymentWarning(false)
             props.setPercentOrTotal("percent");
             props.setTotalDownPayment(props.downPaymentPercent);
